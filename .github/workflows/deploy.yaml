@@ -20,7 +20,7 @@ jobs:
 
       - uses: docker://pandoc/core:3.5
         with:
-          args: "guide.tex -o index.html --number-sections --highlight-style=tango --standalone --embed-resources --css=styles.css"
+          args: "guide.tex -o index.html --number-sections --highlight-style=tango --css=styles.css"
 
       - name: Upload static files as artifact
         uses: actions/upload-pages-artifact@v3
