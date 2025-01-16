@@ -1,0 +1,44 @@
+name: "Deploy"
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  convert:
+    name: Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: docker://pandoc/core:3.5
+        with:
+          args: "pandoc guide.tex -o index.html --number-sections --highlight-style=tango --standalone --embed-resources --css=styles.css"
+
+      - name: Upload static files as artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: index.html
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: convert
+
+    permissions:
+      id-token: write
+      pages: write
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
